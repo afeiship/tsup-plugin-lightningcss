@@ -1,0 +1,46 @@
+{
+  "name": "@jswork/tsup-plugin-lightningcss",
+  "version": "1.0.0",
+  "description": "A Lightning CSS plugin for tsup.",
+  "npmClient": "pnpm",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "prettier": "@jswork/style-guide/prettier",
+  "scripts": {
+    "build": "tsup",
+    "test": "bun test",
+    "release": "release-it",
+    "prepublishOnly": "pnpm build && bun test"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@jswork/style-guide": "^1.0.3",
+    "@jswork/tsup-banner": "^1.0.4",
+    "@swc/core": "^1.5.5",
+    "@types/node": "^20.12.11",
+    "prettier": "^3.3.3",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "homepage": "https://js.work",
+  "keywords": [
+    "tsup-plugin-lightningcss",
+    "number",
+    "num"
+  ]
+}

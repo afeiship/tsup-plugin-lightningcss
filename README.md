@@ -1,36 +1,32 @@
-# rails-module-spina
-> Rails cms spina.
+# tsup-plugin-lightningcss
+> A Lightning CSS plugin for tsup.
 
-## step by step:
-+ install rails:
-```bash
-cd rails-module-spina
-rl-new .
+[![version][version-image]][version-url]
+[![license][license-image]][license-url]
+[![download][download-image]][download-url]
+
+## installation
+```shell
+yarn add @jswork/tsup-plugin-lightningcss
 ```
 
-+ add spina gem & install cms:
-```ruby
-## Gemfiile:
-gem 'spina'
+## usage
+```js
+import tsupLibrary from '@jswork/tsup-plugin-lightningcss';
 
-## bash
-bundle install
-rails g spina:install
+tsupLibrary(1024);
 
-## select demo.rb && install seed content.
-```
-+ remember installed info:
-```conf
-Your Spina site has been succesfully installed!
-
-Restart your server and visit http://localhost:3000 in your browser!
-The admin backend is located at http://localhost:3000/admin.
-
-Site name      :  MySite
-Active theme   :  demo
-User email     :  1290657123@qq.com
-User password  :  spina
+// [1000, 0, 20, 4]
 ```
 
-## resources:
-+ https://github.com/denkGroot/Spina
+## license
+Code released under [the MIT license](https://github.com/afeiship/tsup-plugin-lightningcss/blob/main/LICENSE.txt).
+
+[version-image]: https://img.shields.io/npm/v/@jswork/tsup-plugin-lightningcss
+[version-url]: https://npmjs.org/package/@jswork/tsup-plugin-lightningcss
+
+[license-image]: https://img.shields.io/npm/l/@jswork/tsup-plugin-lightningcss
+[license-url]: https://github.com/afeiship/tsup-plugin-lightningcss/blob/main/LICENSE.txt
+
+[download-image]: https://img.shields.io/npm/dm/@jswork/tsup-plugin-lightningcss
+[download-url]: https://www.npmjs.com/package/@jswork/tsup-plugin-lightningcss
