@@ -13,11 +13,22 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
-import type { Plugin } from 'esbuild';
+import type { PluginBuild } from 'esbuild';
 import { transform } from 'lightningcss';
 
 /** 从 transform 的参数推导，避免耦合 lightningcss 内部类型名。 */
 type Targets = NonNullable<Parameters<typeof transform>[0]['targets']>;
+
+/**
+ * 对外暴露的宽松插件结构，只保留 esbuild 需要的最小形状。
+ * 不直接引用 esbuild 的 Plugin：宿主项目和本包常各自安装不同版本的 esbuild，
+ * 直接引用会因结构类型不一致（例如 initialOptions.packages）导致类型不兼容。
+ * 内部实现仍使用精确的 PluginBuild 类型。
+ */
+export interface EsbuildCompatiblePlugin {
+  name: string;
+  setup: (...args: any[]) => any;
+}
 
 /** 这些浏览器都不支持 CSS Nesting，所以嵌套一定会被展开成扁平选择器。 */
 export const DEFAULT_TARGETS: Targets = {
@@ -39,7 +50,7 @@ export interface LightningCssPluginOptions {
   silent?: boolean;
 }
 
-export function lightningCssPlugin(options: LightningCssPluginOptions = {}): Plugin {
+export function lightningCssPlugin(options: LightningCssPluginOptions = {}): EsbuildCompatiblePlugin {
   const {
     entry = 'src/style.css',
     outFile = 'style.css',
@@ -54,7 +65,7 @@ export function lightningCssPlugin(options: LightningCssPluginOptions = {}): Plu
 
   return {
     name: '@jswork/tsup-plugin-lightningcss',
-    setup(build) {
+    setup(build: PluginBuild) {
       build.onEnd((result) => {
         // JS 构建失败时不生成 CSS
         if (result.errors.length) return;

@@ -1,0 +1,108 @@
+# @jswork/tsup-plugin-lightningcss
+
+> A tsup (esbuild) plugin that compiles a standalone CSS file with Lightning CSS.
+
+## Overview
+
+在 tsup 构建结束时（`onEnd`），用 Lightning CSS 编译一份独立的 CSS 源码到产物目录，供组件库以静态 CSS 文件形式发布。插件返回标准 esbuild `Plugin`，因此也能用于 esbuild / Vite；运行时只依赖 `lightningcss`，`esbuild` 是 peer / 类型依赖。
+
+## Installation
+
+```bash
+pnpm add -D @jswork/tsup-plugin-lightningcss
+```
+
+## Quick Start
+
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+import lightningCssPlugin from '@jswork/tsup-plugin-lightningcss';
+
+export default defineConfig({
+  entry: ['src/index.tsx'],
+  esbuildPlugins: [lightningCssPlugin({ entry: 'src/style.css', outFile: 'style.css' })]
+});
+```
+
+构建后在 `outDir` 生成 `style.css`；宿主引入：`import 'your-lib/dist/style.css'`。
+
+## API
+
+### lightningCssPlugin(options?): esbuild.Plugin
+
+默认导出，同时提供同名命名导出。
+
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `entry` | `string` | `'src/style.css'` | 源 CSS，相对 `absWorkingDir`（默认 cwd）或绝对路径 |
+| `outFile` | `string` | `'style.css'` | 产物名，相对 tsup `outDir` 或绝对路径 |
+| `targets` | `Targets` | `DEFAULT_TARGETS` | Lightning CSS 浏览器目标 |
+| `minify` | `boolean` | `true` | 是否压缩 |
+| `silent` | `boolean` | `false` | 是否关闭日志 |
+
+其他导出：`DEFAULT_TARGETS`（chrome90 / firefox90 / safari15）、`LightningCssPluginOptions`（类型）。
+
+返回值是 esbuild `Plugin`，注册 `setup(build)` 中的 `build.onEnd` 回调。
+
+## Use Cases
+
+1. 组件库把 CSS 作为独立文件发布，避免向 DOM 注入 `<style>`，也无需 `postbuild` 脚本。
+2. CSS 源码用原生 CSS Nesting 编写，构建时按 targets 展开为扁平选择器，兼容旧浏览器。
+3. 任何 esbuild / Vite 构建想额外产出一份降级后的 CSS。
+
+## Examples
+
+```css
+/* src/style.css —— 原生 CSS Nesting */
+.card {
+  color: red;
+  & .title { color: blue; }
+  &.card--dark { background: #111; }
+}
+```
+
+```css
+/* dist/style.css —— 编译后（示意） */
+.card{color:red}.card .title{color:blue}.card.card--dark{background:#111}
+```
+
+注意：Lightning CSS 遵循 CSS Nesting 规范，不支持 Sass 的 `&__xxx` 后缀拼接。
+
+## Features
+
+- `onEnd` 触发，JS 构建失败时不生成 CSS；编译错误转成 esbuild `errors`。
+- 针对 tsup 多 format 重复构建做去重（输出路径 + 源内容 hash + 文件存在判断）；`clean` 删除产物或源码变化后自动重建，watch 可用。
+- 输出目录跟随 `build.initialOptions.outdir`，路径解析基于 `absWorkingDir || process.cwd()`。
+
+## Project Structure
+
+```
+tsup-plugin-lightningcss/
+├── src/index.ts          # 插件源码（唯一导出入口）
+├── __tests__/            # bun test 用例
+├── dist/                 # tsup 构建产物（cjs / esm / d.ts）
+├── tsup.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+## Development
+
+```bash
+pnpm install
+pnpm build       # tsup：cjs + esm + dts
+bun test         # bun test runner
+pnpm typecheck   # tsc --noEmit
+pnpm release     # release-it
+```
+
+## Links
+
+- **NPM**: https://npmjs.org/package/@jswork/tsup-plugin-lightningcss
+- **Homepage**: https://js.work
+- **Lightning CSS**: https://lightningcss.dev/
+
+## License
+
+MIT
